@@ -1,0 +1,31 @@
+name: Send Discord Message
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel_id:
+        description: "Discord Channel ID"
+        required: true
+        type: string
+      message:
+        description: "Message to send"
+        required: true
+        type: string
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send message as SuniBot
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          CHANNEL_ID: ${{ inputs.channel_id }}
+          MESSAGE: ${{ inputs.message }}
+        run: |
+          curl --fail-with-body \
+            -X POST \
+            -H "Authorization: Bot $DISCORD_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" \
+            --data "$(jq -n --arg content "$MESSAGE" '{content: $content}')"
