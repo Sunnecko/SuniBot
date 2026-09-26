@@ -1,0 +1,45 @@
+name: Discord Spam Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel_id:
+        description: "Discord Channel ID"
+        required: true
+        type: string
+      message:
+        description: "Message to send"
+        required: true
+        type: string
+      count:
+        description: "Number of messages"
+        required: true
+        default: "100"
+        type: string
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send test messages as SuniBot
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          CHANNEL_ID: ${{ inputs.channel_id }}
+          MESSAGE: ${{ inputs.message }}
+          COUNT: ${{ inputs.count }}
+        run: |
+          for i in $(seq 1 "$COUNT"); do
+            echo "Sending message $i/$COUNT"
+
+            curl \
+              -X POST \
+              -H "Authorization: Bot $DISCORD_TOKEN" \
+              -H "Content-Type: application/json" \
+              "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" \
+              --data "$(jq -n \
+                --arg content "$MESSAGE" \
+                '{content: $content}')"
+
+            sleep 0.2
+          done
