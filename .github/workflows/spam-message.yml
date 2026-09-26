@@ -41,5 +41,5 @@ jobs:
                 --arg content "$MESSAGE" \
                 '{content: $content}')"
 
-            sleep 0.2
+            sleep 0.0001
           done
